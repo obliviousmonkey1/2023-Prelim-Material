@@ -21,7 +21,7 @@ class Dastan:
         self.__CreatePieces(NoOfPieces)
         self._CurrentPlayer = self._Players[0]
 
-    def __DisplayBoard(self):
+    def __DisplayBoard(self, possibleMoves=[]):
         print("\n" + "   ", end="")
         for Column in range(1, self._NoOfColumns + 1):
             print(str(Column) + "  ", end="")
@@ -36,7 +36,10 @@ class Dastan:
                 print("|" + self._Board[Index].GetSymbol(), end="")
                 PieceInSquare = self._Board[Index].GetPieceInSquare()
                 if PieceInSquare is None:
-                    print(" ", end="")
+                    if (str(Row)+str(Column)) in str(possibleMoves):
+                        print(f"#", end="")
+                    else:
+                        print(" ", end="")
                 else:
                     print(PieceInSquare.GetSymbol(), end="")
             print("|")
@@ -180,6 +183,7 @@ class Dastan:
     ### get all legal moves ###
     def __getAllLegalMoves(self, choice, StartSquareReference):
         possibleMoves = []
+        board = []
         for r in range(self._NoOfRows):
             for c in range(self._NoOfColumns):
                 finishSquareRef = int(str(r) + str(c))
@@ -188,7 +192,10 @@ class Dastan:
                     legal_move = self._CurrentPlayer.CheckPlayerMove(choice, StartSquareReference, finishSquareRef)
                     if legal_move:
                         possibleMoves.append(f'move : {finishSquareRef}, points gained for move {self.__GetPointsForOccupancyByPlayer(self._CurrentPlayer) + self.__CalculatePieceCapturePoints(finishSquareRef) -(choice + (2 * (choice - 1)))}, Score after {self._CurrentPlayer.GetScore() + self.__GetPointsForOccupancyByPlayer(self._CurrentPlayer) + self.__CalculatePieceCapturePoints(finishSquareRef) -(choice + (2 * (choice - 1)))}')
+                        board.append(finishSquareRef)
         print("possible moves are", possibleMoves)
+        print(board)
+        self.__DisplayBoard(board)
     ###############################
 
     def __UpdateBoard(self, StartSquareReference, FinishSquareReference):
