@@ -1,0 +1,17 @@
+class diagrams
++ public
+- private 
+# protected 
+
+class diagrams made up of 3 sections
+- name
+- attributes 
+- methods
+
+attribute example
++ name : string
+
+method example
++ SetWeight(weight : float): void
+
+class : inheritance, composition (black diamond), aggrigate (clear diamond)
