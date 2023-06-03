@@ -4,6 +4,7 @@
 #developed in the Python 3.9 programming environment
 
 import random
+import copy 
 
 class Dastan:
     def __init__(self, R, C, NoOfPieces):
@@ -131,6 +132,7 @@ class Dastan:
         GameOver = False
         while not GameOver:
             self.__DisplayState()
+            self._redoQueue = []
             SquareIsValid = False
             Choice = 0
             while Choice < 1 or Choice > 3:
@@ -146,6 +148,8 @@ class Dastan:
                 FinishSquareReference = self.__GetSquareReference("to move to")
                 SquareIsValid = self.__CheckSquareIsValid(FinishSquareReference, False)
             MoveLegal = self._CurrentPlayer.CheckPlayerMove(Choice, StartSquareReference, FinishSquareReference)
+            board = self._Board
+            self._redoQueue.append([copy.deepcopy(self._Board), self._CurrentPlayer.GetScore()])
             if MoveLegal:
                 PointsForPieceCapture = self.__CalculatePieceCapturePoints(FinishSquareReference)
                 self._CurrentPlayer.ChangeScore(-(Choice + (2 * (Choice - 1))))
@@ -153,8 +157,17 @@ class Dastan:
                 self.__UpdateBoard(StartSquareReference, FinishSquareReference)
                 self.__UpdatePlayerScore(PointsForPieceCapture)
                 print("New score: " + str(self._CurrentPlayer.GetScore()) + "\n")
-            if self._CurrentPlayer.SameAs(self._Players[0]):
-                self._CurrentPlayer = self._Players[1]
+            
+
+            self.__DisplayState()
+
+            redo = int(input('Would you like to redo (1/0) :'))
+            if redo:
+                self._Board = self._redoQueue[0][0]
+                self._CurrentPlayer.setScore(self._redoQueue[0][1])
+                
+            elif self._CurrentPlayer.SameAs(self._Players[0]):
+                    self._CurrentPlayer = self._Players[1]
             else:
                 self._CurrentPlayer = self._Players[0]
             GameOver = self.__CheckIfGameOver()
@@ -163,6 +176,9 @@ class Dastan:
 
     def __UpdateBoard(self, StartSquareReference, FinishSquareReference):
         self._Board[self.__GetIndexOfSquare(FinishSquareReference)].SetPiece(self._Board[self.__GetIndexOfSquare(StartSquareReference)].RemovePiece())
+
+    def __Redo(self):
+        pass
 
     def __DisplayFinalResult(self):
         if self._Players[0].GetScore() == self._Players[1].GetScore():
@@ -464,10 +480,12 @@ class Player:
     def ChangeScore(self, Amount):
         self.__Score += Amount
 
+    def setScore(self, amount):
+        self.__Score = amount
+
     def CheckPlayerMove(self, Pos, StartSquareReference, FinishSquareReference):
         Temp = self.__Queue.GetMoveOptionInPosition(Pos - 1)
         return Temp.CheckIfThereIsAMoveToSquare(StartSquareReference, FinishSquareReference)
-
 
 def Main():
     ThisGame = Dastan(6, 6, 4)

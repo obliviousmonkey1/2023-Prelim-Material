@@ -69,8 +69,33 @@ class Dastan:
         else:
             return True
 
+    def __CheckBarrierIsValid(self, SquareReferences):
+        for SquareReference in SquareReferences:
+            if not self.__CheckSquareInBounds(SquareReference):
+                return False
+            PieceInSquare = self._Board[self.__GetIndexOfSquare(SquareReference)].GetPieceInSquare()
+            if PieceInSquare is not None:
+                return False
+        return True
+
+    def __CheckManhattanDistance(self, StartSquareReference, FinishSquareReference):
+        if int(str(StartSquareReference)[0]) > int(str(FinishSquareReference)[0]):
+            print(True)
+
+    def __PlaceBarrier(self, SquareReference):
+        SquareReferences = [int(f'{SquareReference[0]}{int(SquareReference[1])-1}'), int(SquareReference), int(f'{SquareReference[0]}{int(SquareReference[1])+1}')]
+        if self.__CheckBarrierIsValid(SquareReferences):
+            if self._CurrentPlayer.GetDirection() == 1:
+                for SquareReference in SquareReferences:
+                    self._Board[self.__GetIndexOfSquare(SquareReference)] = Barrier(self._CurrentPlayer, 'B')
+            else:
+                for SquareReference in SquareReferences:
+                    self._Board[self.__GetIndexOfSquare(SquareReference)] = Barrier(self._CurrentPlayer, 'b')
+
     def __CheckSquareIsValid(self, SquareReference, StartSquare):
         if not self.__CheckSquareInBounds(SquareReference):
+            return False
+        if self._Board[self.__GetIndexOfSquare(SquareReference)].ContainsBarrier():
             return False
         PieceInSquare = self._Board[self.__GetIndexOfSquare(SquareReference)].GetPieceInSquare()
         if PieceInSquare is None:
@@ -134,10 +159,15 @@ class Dastan:
             SquareIsValid = False
             Choice = 0
             while Choice < 1 or Choice > 3:
-                Choice = int(input("Choose move option to use from queue (1 to 3) or 9 to take the offer: "))
+                Choice = int(input("Choose move option to use from queue (1 to 3) or 9 to take the offer or 0 to place barrier: "))
                 if Choice == 9:
                     self.__UseMoveOptionOffer()
                     self.__DisplayState()
+                elif Choice == 0:
+                    SquareReference = input('Enter location > ')
+                    self.__PlaceBarrier(SquareReference)
+                    self.__DisplayState()
+
             while not SquareIsValid:
                 StartSquareReference = self.__GetSquareReference("containing the piece to move")
                 SquareIsValid = self.__CheckSquareIsValid(StartSquareReference, True)
@@ -145,6 +175,8 @@ class Dastan:
             while not SquareIsValid:
                 FinishSquareReference = self.__GetSquareReference("to move to")
                 SquareIsValid = self.__CheckSquareIsValid(FinishSquareReference, False)
+
+            MoveLegal = self.__CheckManhattanDistance(StartSquareReference, FinishSquareReference)
             MoveLegal = self._CurrentPlayer.CheckPlayerMove(Choice, StartSquareReference, FinishSquareReference)
             if MoveLegal:
                 PointsForPieceCapture = self.__CalculatePieceCapturePoints(FinishSquareReference)
@@ -338,6 +370,9 @@ class Square:
     def GetPointsForOccupancy(self, CurrentPlayer):
         return 0
 
+    def ContainsBarrier(self):
+        return self.__class__ == Barrier
+
     def GetBelongsTo(self):
         return self._BelongsTo
 
@@ -366,6 +401,13 @@ class Kotla(Square):
                 return 1
             else:
                 return 0
+
+class Barrier(Square):
+    def __init__(self, P, S):
+        super(Barrier, self).__init__()
+        self._BelongsTo = P
+        self._Symbol = S
+    
 
 class MoveOption:
     def __init__(self, N):

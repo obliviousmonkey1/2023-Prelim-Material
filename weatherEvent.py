@@ -16,6 +16,7 @@ class Dastan:
         self._NoOfRows = R
         self._NoOfColumns = C
         self._MoveOptionOfferPosition = 0
+        self.weatherEvent = False
         self.__CreateMoveOptionOffer()
         self.__CreateBoard()
         self.__CreatePieces(NoOfPieces)
@@ -133,6 +134,18 @@ class Dastan:
             self.__DisplayState()
             SquareIsValid = False
             Choice = 0
+            if self.weatherEvent:
+                print(f'weather event occuring : turns left till active { self.weatherEventC.CountDown}, column {self.weather_column}')
+                if self.weatherEventC.CountDownComplete():
+                    
+                    for row in range(1, self._NoOfRows+1):
+                        self._Board[self.__GetIndexOfSquare(int(f'{row}{self.weather_column}'))].RemovePiece()
+                    print('Weather Event has ended')
+                    self.weatherEvent = False
+
+
+            if not self.weatherEvent:
+                self._WeatherEventOccurs()
             while Choice < 1 or Choice > 3:
                 Choice = int(input("Choose move option to use from queue (1 to 3) or 9 to take the offer: "))
                 if Choice == 9:
@@ -160,6 +173,28 @@ class Dastan:
             GameOver = self.__CheckIfGameOver()
         self.__DisplayState()
         self.__DisplayFinalResult()
+
+    def _WeatherEventOccurs(self):
+        store = []
+        if random.randint(0, 1):
+            for row in range(self._NoOfRows):
+                for column in range(self._NoOfColumns):
+                    index = self.__GetIndexOfSquare(int(f'{row}{column}'))
+                    if self._Board[index].GetPieceInSquare() == None:
+                        pass
+                    else:
+                        store.append([index, row, column])
+                       
+            w = random.choice(store)
+            self.weatherIndex = w[0]
+            self.weather_row = w[1]
+            self.weather_column = w[2]
+            self.weatherEventC = WeatherEvent()
+            print(f'WEATHER EVENT OCCURING column {self.weather_column}')
+            self.weatherEvent = True
+        else:
+            self.weatherEvent = False
+
 
     def __UpdateBoard(self, StartSquareReference, FinishSquareReference):
         self._Board[self.__GetIndexOfSquare(FinishSquareReference)].SetPiece(self._Board[self.__GetIndexOfSquare(StartSquareReference)].RemovePiece())
@@ -425,6 +460,22 @@ class MoveOptionQueue:
     def GetMoveOptionInPosition(self, Pos):
         return self.__Queue[Pos]
 
+class WeatherEvent:
+    def __init__(self):
+        self.CountDown = 0
+    
+    def CountDownComplete(self):
+        if self.CountDown == 0:
+            return True
+        self.CountDown -=1
+        return False
+
+    def SetWeatherLocation(self):
+        pass
+
+    def GetWeatherLoacation(self):
+        pass
+
 class Player:
     def __init__(self, N, D):
         self.__Score = 100
@@ -467,6 +518,7 @@ class Player:
     def CheckPlayerMove(self, Pos, StartSquareReference, FinishSquareReference):
         Temp = self.__Queue.GetMoveOptionInPosition(Pos - 1)
         return Temp.CheckIfThereIsAMoveToSquare(StartSquareReference, FinishSquareReference)
+
 
 
 def Main():

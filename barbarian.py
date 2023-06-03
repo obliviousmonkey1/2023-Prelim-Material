@@ -328,18 +328,18 @@ class Dastan:
             return self.__CreateBarbarianMoveOption(Direction)
 
     def __CreateMoveOptions(self):
-        self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("ryott", 1))
+        self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("barbarian", 1))
         self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("chowkidar", 1))
         self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("cuirassier", 1))
         self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("faujdar", 1))
         self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("jazair", 1))
-        self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("barbarian", 1))
-        self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("ryott", -1))
+        self._Players[0].AddToMoveOptionQueue(self.__CreateMoveOption("ryott", 1))
+        self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("barbarian", -1))
         self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("chowkidar", -1))
         self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("jazair", -1))
         self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("faujdar", -1))
         self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("cuirassier", -1))
-        self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("barbarian", -1))
+        self._Players[1].AddToMoveOptionQueue(self.__CreateMoveOption("ryott", -1))
 
 class Piece:
     def __init__(self, T, B, P, S):

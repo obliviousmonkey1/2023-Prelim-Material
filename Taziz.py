@@ -179,6 +179,9 @@ class Dastan:
                     S = Kotla(self._Players[0], "K")
                 elif Row == self._NoOfRows and Column == self._NoOfColumns // 2 + 1:
                     S = Kotla(self._Players[1], "k")
+                
+                elif Row == self._NoOfRows // 2 + 1 and  Column == self._NoOfColumns // 2 + self._NoOfColumns % 2:
+                        S = Taziz(None, 'x')
                 else:
                     S = Square()
                 self._Board.append(S)
@@ -367,6 +370,42 @@ class Kotla(Square):
             else:
                 return 0
 
+class Taziz(Square):
+    def __init__(self, P, S):
+        super(Taziz, self).__init__()
+        self._BelongsTo = P
+        self._Symbol = S
+        self._CampedTurns = 0
+    
+    def SetPiece(self, p):
+        if p.GetBelongsTo().GetDirection() == 1:
+            self._Symbol = 'A'
+            if p.GetBelongsTo().GetDirection() != self._BelongsTo.GetDirection():
+                self._CampedTurns == 0
+        else:
+            self._Symbol = 'a'
+            if p.GetBelongsTo().GetDirection() != self._BelongsTo.GetDirection():
+                self._CampedTurns == 0
+        self._PieceInSquare = p
+        self._CurrentOccupent = p.GetBelongsTo().GetDirection()
+      
+
+    def CheckCamp(self, P):
+        if self._PieceInSquare != None:
+            if self._CurrentOccupent == P.GetDirection():
+                self._CampedTurns += 1
+        
+    def GetCampedTwoTurns(self, P):
+        return self._CampedTurns >= 2 and P.SameAs(self._PieceInSquare.GetBelongsTo())
+            
+
+    def RemovePiece(self):
+        PieceToReturn = self._PieceInSquare
+        self._PieceInSquare = None
+        self._Symbol = 'x'
+        return PieceToReturn
+
+
 class MoveOption:
     def __init__(self, N):
         self._Name = N
@@ -468,9 +507,8 @@ class Player:
         Temp = self.__Queue.GetMoveOptionInPosition(Pos - 1)
         return Temp.CheckIfThereIsAMoveToSquare(StartSquareReference, FinishSquareReference)
 
-
 def Main():
-    ThisGame = Dastan(6, 6, 4)
+    ThisGame = Dastan(6,6, 4)
     ThisGame.PlayGame()
     print("Goodbye!")
     input()
